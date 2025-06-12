@@ -22,7 +22,7 @@ export const Bot = launchBot();
 
 async function start() {
   try {
-    await mongoose.connect(process.env.MONGO_URL);
+    // await mongoose.connect(process.env.MONGO_URL);
 
     app.listen(process.env.PORT, async () => {
       console.log("server started");

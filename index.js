@@ -13,9 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// app.get("/api/users", getUsers);
 app.post("/api/users", updateUser);
-// app.post("/api/admin", makeAdmin);
 app.post("/api/verify", verifyTelegramInitData);
 
 export const Bot = launchBot();

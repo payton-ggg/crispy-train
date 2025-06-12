@@ -1,8 +1,4 @@
 export const getMessage = async (transcript) => {
-  if (!navigator.onLine) {
-    return "You appear to be offline. Please check your internet connection and try again.";
-  }
-
   try {
     const response = await fetch(
       "https://api.intelligence.io.solutions/api/v1/chat/completions",

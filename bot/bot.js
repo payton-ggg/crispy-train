@@ -1,5 +1,6 @@
 import TelegramBot from "node-telegram-bot-api";
-export const getMessage = async (transcript, model, id, onStreamChunk) => {
+
+export const getMessage = async (transcript, id, onStreamChunk) => {
   try {
     const response = await fetch(
       `https://api.intelligence.io.solutions/api/v1/chat${
@@ -107,21 +108,6 @@ const launchBot = () => {
 
   Bot.setMyCommands(commands);
 
-  // Bot.onText(/\/users/, async (msg, match) => {
-  //   const userId = msg.from.id;
-  //   const { data: users } = await axios.get("http://my-personal-api-tf:10000/api/users");
-
-  //   const createUserList = () =>
-  //     users
-  //       .map(
-  //         (user, iter) =>
-  //           `${iter}. ${user.username}. ID: ${user._id}. Balance: ${user.balance}`
-  //       )
-  //       .join("\n\n");
-
-  //   Bot.sendMessage(userId, createUserList());
-  // });
-
   Bot.onText(/\/start/, async (msg, match) => {
     try {
       const chatId = msg.from.id;
@@ -148,16 +134,32 @@ const launchBot = () => {
     }
   });
 
-  let streamedMessage = "";
-
   Bot.on("message", async (msg) => {
     const chatId = msg.chat.id;
     const text = msg.text;
-    const message = await getMessage(text, (chunk) => {
-      streamedMessage += chunk;
-    });
 
-    await Bot.sendMessage(chatId, `message: ${message}`);
+    let fullResponse = "";
+
+    const onStreamChunk = (chunk) => {
+      fullResponse += chunk;
+      console.log("Streamed chunk:", chunk);
+    };
+
+    try {
+      const finalResponse = await getMessage(text, null, onStreamChunk);
+
+      fullResponse = finalResponse || fullResponse;
+
+      console.log("\nFull response from AI:", fullResponse);
+
+      await Bot.sendMessage(chatId, fullResponse);
+    } catch (error) {
+      console.error("Error processing message with AI:", error);
+      await Bot.sendMessage(
+        chatId,
+        "I apologize, but I encountered an error while processing your request. Please try again later."
+      );
+    }
   });
 
   return Bot;
